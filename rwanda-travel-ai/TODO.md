@@ -20,9 +20,10 @@
 - [ ] `Chatbot.jsx` - Chat + speech recognition
 - [ ] `Translator.jsx` - Translation + speech
 - [ ] `Recommendations.jsx` - Dynamic rendering
+- [ ] `Housing.jsx` - Real estate valuation & booking form
 
 ## [ ] 3. Logic Migration (1:1 from app.js)
-- [ ] All 6 API endpoints (/predict, /recommend-trip, /chat, /translate, /detect, /get-route-distance)
+- [ ] All 8 API endpoints (/predict, /recommend-trip, /chat, /translate, /detect, /get-route-distance, /predict-housing, /housing-locations)
 - [ ] SpeechRecognition hooks for chat/translator
 - [ ] debouncedFetchDistance (useCallback + useEffect)
 - [ ] selectedInterests (useState Set)

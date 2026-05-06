@@ -39,6 +39,20 @@ class PredictRequest(BaseModel):
     demand: str | int
 
 
+class HousingPredictRequest(BaseModel):
+    location: str
+    size_sqm: float
+    bedrooms: int
+    bathrooms: int
+    floors: int
+    age_years: int
+    parking: int
+    furnished: int
+    distance_to_city_km: float
+    nearby_schools: int
+    nearby_hospitals: int
+
+
 class ChatRequest(BaseModel):
     message: str
     history: list[dict] | None = None
@@ -77,6 +91,21 @@ def predict(data: PredictRequest):
     )
 
     return {"predicted_price": price}
+
+
+@app.post("/predict-housing")
+def predict_housing(data: HousingPredictRequest):
+    from backend.predictor import predict_housing_price
+    result = predict_housing_price(data.model_dump())
+    if isinstance(result, dict) and "error" in result:
+        return result
+    return {"predicted_price": result}
+
+
+@app.get("/housing-locations")
+def housing_locations():
+    from backend.predictor import get_housing_locations
+    return {"locations": get_housing_locations()}
 
 
 class RouteDistanceRequest(BaseModel):

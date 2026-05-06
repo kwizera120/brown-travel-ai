@@ -5,6 +5,7 @@ import { Places } from "./pages/Places";
 import { FoodGuide } from "./pages/FoodGuide";
 import { TravelInfo } from "./pages/TravelInfo";
 import { MyItinerary } from "./pages/MyItinerary";
+import { Housing } from "./pages/Housing";
 import { Login } from "./pages/Login";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -38,6 +39,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <TripPlanner />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/housing",
+    element: (
+      <ProtectedRoute>
+        <Housing />
       </ProtectedRoute>
     ),
   },

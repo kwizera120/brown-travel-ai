@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router';
-import { Home, MapPin, Utensils, Compass, Calendar, Info, User, LogOut } from 'lucide-react';
+import { Home, MapPin, Utensils, Compass, Building2, Calendar, Info, User, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
 import { Logo } from './Logo';
@@ -15,6 +15,7 @@ export function Navigation() {
     { path: '/places', icon: MapPin, label: 'Places' },
     { path: '/food-guide', icon: Utensils, label: 'Food' },
     { path: '/trip-planner', icon: Compass, label: 'Trip Planner' },
+    { path: '/housing', icon: Building2, label: 'Housing' },
     { path: '/my-itinerary', icon: Calendar, label: 'Itinerary' },
     { path: '/travel-info', icon: Info, label: 'Info' },
   ];
