@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Building2, Home, MapPin, Ruler, Bed, Bath, Layers, Calendar, Car, Sofa, GraduationCap, Hospital, TrendingUp, Search, Info, Send, X, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Building2, Home, MapPin, Ruler, Bed, Bath, Layers, Calendar, Car, Sofa, GraduationCap, Hospital, TrendingUp, Search, Info, Send, X, User, Bot, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -9,17 +9,26 @@ import { Checkbox } from '../components/ui/checkbox';
 import { Badge } from '../components/ui/badge';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Textarea } from '../components/ui/textarea';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+}
 
 export function Housing() {
   const [locations, setLocations] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [predictedPrice, setPredictedPrice] = useState<number | null>(null);
   const [housingType, setHousingType] = useState<'buy' | 'rent'>('buy');
-  const [isContactFormOpen, setIsContactFormOpen] = useState(false);
-  const [isMessageSent, setIsMessageSent] = useState(false);
-  const [message, setMessage] = useState('');
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<Message[]>([
+    { role: 'assistant', content: "Hello! I'm your Sura Rwanda Housing Assistant. How can I help you with your property search today?" }
+  ]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isChatLoading, setIsChatLoading] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
   const [formData, setFormData] = useState({
     location: '',
     size_sqm: '',
@@ -34,9 +43,22 @@ export function Housing() {
     nearby_hospitals: '1'
   });
 
+  // Scroll animations for cards
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 500], [0, -150]);
+  const y2 = useTransform(scrollY, [0, 500], [0, -100]);
+  const y3 = useTransform(scrollY, [0, 500], [0, -50]);
+  const opacity = useTransform(scrollY, [0, 300, 500], [1, 0.5, 0.2]);
+
   useEffect(() => {
     fetchHousingLocations();
   }, []);
+
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages]);
 
   const fetchHousingLocations = async () => {
     try {
@@ -107,14 +129,40 @@ export function Housing() {
     }
   };
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsMessageSent(true);
-    setTimeout(() => {
-      setIsMessageSent(false);
-      setIsContactFormOpen(false);
-      setMessage('');
-    }, 3000);
+    if (!inputMessage.trim() || isChatLoading) return;
+
+    const newUserMessage: Message = { role: 'user', content: inputMessage };
+    setChatMessages(prev => [...prev, newUserMessage]);
+    setInputMessage('');
+    setIsChatLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:8000/housing-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: inputMessage,
+          history: chatMessages.map(m => ({ role: m.role, content: m.content })),
+          property_context: predictedPrice ? {
+            ...formData,
+            predicted_price: predictedPrice,
+            type: housingType
+          } : null
+        })
+      });
+
+      const data = await response.json();
+      if (data.response) {
+        setChatMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+      }
+    } catch (error) {
+      console.error('Chat error:', error);
+      setChatMessages(prev => [...prev, { role: 'assistant', content: "I'm sorry, I'm having trouble connecting to my AI brain. Please try again." }]);
+    } finally {
+      setIsChatLoading(false);
+    }
   };
 
   return (
@@ -360,7 +408,7 @@ export function Housing() {
                     >
                       {loading ? (
                         <div className="flex items-center gap-3">
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <Loader2 className="w-5 h-5 animate-spin" />
                           Analyzing Market Data...
                         </div>
                       ) : (
@@ -374,7 +422,7 @@ export function Housing() {
 
             {/* Result Column */}
             <div className="lg:col-span-4 space-y-8">
-              <Card className="border-none shadow-xl shadow-slate-200/50 bg-gradient-to-br from-slate-900 to-slate-800 text-white overflow-hidden sticky top-28">
+              <Card className="border-none shadow-xl shadow-slate-200/50 bg-gradient-to-br from-slate-900 to-slate-800 text-white overflow-hidden sticky top-28 z-20">
                 <CardContent className="p-8 text-center">
                   <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/20 text-primary text-xs font-black uppercase tracking-widest mb-6">
                     <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
@@ -401,7 +449,7 @@ export function Housing() {
 
                   <div className="w-full">
                     <Button 
-                      onClick={() => setIsContactFormOpen(true)}
+                      onClick={() => setIsChatOpen(true)}
                       className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold"
                     >
                       Contact Agent
@@ -412,65 +460,75 @@ export function Housing() {
 
               <div className="relative">
                 <AnimatePresence>
-                  {isContactFormOpen && (
+                  {isChatOpen && (
                     <motion.div
                       initial={{ opacity: 0, y: 20, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                      className="absolute inset-0 z-10 bg-white rounded-2xl border border-slate-200 shadow-2xl p-6 overflow-hidden"
+                      className="absolute inset-0 z-30 bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col h-[500px]"
                     >
-                      <div className="flex flex-col h-full">
-                        <div className="flex items-center justify-between mb-4">
-                          <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <Send className="w-5 h-5 text-primary" />
-                            Message Agent
-                          </h4>
-                          <button 
-                            onClick={() => setIsContactFormOpen(false)}
-                            className="p-2 hover:bg-slate-100 rounded-full transition-colors"
-                          >
-                            <X className="w-5 h-5 text-slate-500" />
-                          </button>
-                        </div>
-
-                        {isMessageSent ? (
-                          <motion.div 
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="flex flex-col items-center justify-center flex-grow text-center"
-                          >
-                            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                              <CheckCircle2 className="w-8 h-8 text-green-600" />
-                            </div>
-                            <h5 className="text-xl font-bold text-slate-900 mb-2">Message Received!</h5>
-                            <p className="text-slate-500 text-sm">
-                              Thank you for your interest. Our premium agents will get back to you within 24 hours.
-                            </p>
-                          </motion.div>
-                        ) : (
-                          <form onSubmit={handleContactSubmit} className="flex flex-col flex-grow">
-                            <Label htmlFor="message" className="text-sm font-bold text-slate-700 mb-2">
-                              Your Message or Recommendation
-                            </Label>
-                            <Textarea
-                              id="message"
-                              placeholder="I'm interested in this property. Please provide more details..."
-                              className="flex-grow rounded-xl border-slate-200 focus:ring-primary mb-4 resize-none"
-                              value={message}
-                              onChange={(e) => setMessage(e.target.value)}
-                              required
-                            />
-                            <Button type="submit" className="w-full h-12 rounded-xl font-bold">
-                              Send Message
-                            </Button>
-                          </form>
-                        )}
+                      <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
+                        <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                          <Bot className="w-5 h-5 text-primary" />
+                          Housing AI Assistant
+                        </h4>
+                        <button 
+                          onClick={() => setIsChatOpen(false)}
+                          className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                        >
+                          <X className="w-5 h-5 text-slate-500" />
+                        </button>
                       </div>
+
+                      <div className="flex-grow overflow-y-auto p-4 space-y-4 bg-slate-50/50">
+                        {chatMessages.map((m, idx) => (
+                          <div key={idx} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${
+                              m.role === 'user' 
+                                ? 'bg-primary text-white rounded-tr-none' 
+                                : 'bg-white border border-slate-200 text-slate-700 rounded-tl-none shadow-sm'
+                            }`}>
+                              <div className="flex items-center gap-2 mb-1">
+                                {m.role === 'user' ? <User className="w-3 h-3" /> : <Bot className="w-3 h-3 text-primary" />}
+                                <span className="text-[10px] font-bold uppercase tracking-wider opacity-70">
+                                  {m.role === 'user' ? 'You' : 'AI Assistant'}
+                                </span>
+                              </div>
+                              <p className="leading-relaxed">{m.content}</p>
+                            </div>
+                          </div>
+                        ))}
+                        {isChatLoading && (
+                          <div className="flex justify-start">
+                            <div className="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none shadow-sm">
+                              <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                            </div>
+                          </div>
+                        )}
+                        <div ref={chatEndRef} />
+                      </div>
+
+                      <form onSubmit={handleSendMessage} className="p-4 border-t border-slate-100 bg-white">
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Ask about properties..."
+                            value={inputMessage}
+                            onChange={(e) => setInputMessage(e.target.value)}
+                            className="rounded-xl border-slate-200 focus:ring-primary"
+                          />
+                          <Button type="submit" size="icon" disabled={isChatLoading} className="rounded-xl shrink-0">
+                            <Send className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </form>
                     </motion.div>
                   )}
                 </AnimatePresence>
 
-                <div className="grid grid-cols-1 gap-4">
+                <motion.div 
+                  className="grid grid-cols-1 gap-4 z-10 relative"
+                  style={{ y: y1, opacity }}
+                >
                   <Card className="border-none shadow-lg shadow-slate-200/50">
                     <CardContent className="p-6 flex items-center gap-4">
                       <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
@@ -482,6 +540,12 @@ export function Housing() {
                       </div>
                     </CardContent>
                   </Card>
+                </motion.div>
+
+                <motion.div 
+                  className="grid grid-cols-1 gap-4 mt-4 z-10 relative"
+                  style={{ y: y2, opacity }}
+                >
                   <Card className="border-none shadow-lg shadow-slate-200/50">
                     <CardContent className="p-6 flex items-center gap-4">
                       <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
@@ -493,6 +557,12 @@ export function Housing() {
                       </div>
                     </CardContent>
                   </Card>
+                </motion.div>
+
+                <motion.div 
+                  className="grid grid-cols-1 gap-4 mt-4 z-10 relative"
+                  style={{ y: y3, opacity }}
+                >
                   <Card className="border-none shadow-lg shadow-slate-200/50">
                     <CardContent className="p-6 flex items-center gap-4">
                       <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
@@ -504,7 +574,7 @@ export function Housing() {
                       </div>
                     </CardContent>
                   </Card>
-                </div>
+                </motion.div>
               </div>
             </div>
           </div>

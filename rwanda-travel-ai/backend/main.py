@@ -143,10 +143,27 @@ def get_route_distance(data: RouteDistanceRequest):
     return {"error": "Distance not available for this route", "success": False}
 
 
+class HousingChatRequest(BaseModel):
+    message: str
+    history: list[dict] | None = None
+    property_context: dict | None = None
+
+
+@app.post("/housing-chat")
+def housing_chat(data: HousingChatRequest):
+    from backend.gemini_bot import get_housing_chatbot_response
+    reply = get_housing_chatbot_response(data.message, data.history, data.property_context)
+    return {"response": reply}
+
+
 @app.post("/chat")
 def chat(data: ChatRequest):
-    from backend.chatbot import ask_groq
-    reply = ask_groq(data.message, data.history)
+    from backend.gemini_bot import ask_gemini
+    system_instruction = (
+        "You are Rwanda Travel AI, a professional and helpful travel assistant. "
+        "You help users plan trips, estimate fares, and discover destinations in Rwanda."
+    )
+    reply = ask_gemini(data.message, data.history, system_instruction)
     return {"response": reply}
 
 
