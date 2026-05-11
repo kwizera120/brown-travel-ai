@@ -4,7 +4,7 @@ import json
 import urllib.request
 import urllib.error
 
-BASE = os.environ.get('VITE_API_BASE_URL', 'http://localhost:8000').rstrip('/')
+BASE = os.environ.get('VITE_API_BASE_URL', 'http://localhost:8080').rstrip('/')
 
 TESTS = [
     ('GET', '/health', None),

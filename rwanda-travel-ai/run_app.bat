@@ -30,13 +30,13 @@ echo ============================================
 echo Starting FastAPI Backend Server
 echo ============================================
 echo.
-echo Server will be available at: http://localhost:8000
+echo Server will be available at: http://localhost:8080
 echo Translation feature is integrated in the backend
 echo.
 echo Press Ctrl+C to stop the server
 echo ============================================
 echo.
 
-uvicorn backend.main:app --reload --port 8000
+uvicorn backend.main:app --reload --port 8080
 
 pause

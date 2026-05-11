@@ -21,7 +21,7 @@ run_app.bat
 This will automatically:
 - Check and install language models if needed
 - Start the FastAPI backend server
-- Make the app available at http://localhost:8000
+- Make the app available at http://localhost:8080
 
 ### Option 2: Manual Setup
 
@@ -37,11 +37,11 @@ python install_languages.py
 
 3. **Start the Server**
 ```bash
-uvicorn backend.main:app --reload --port 8000
+uvicorn backend.main:app --reload --port 8080
 ```
 
 4. **Open in Browser**
-Navigate to `http://localhost:8000`
+Navigate to `http://localhost:8080`
 
 > If port `8000` is already in use, you can start the server on an alternate port:
 > ```bash

@@ -15,11 +15,11 @@
 
 ## [ ] 4. Start Backend Services
 - [ ] Auth backend: cd authentication-backend && python app.py (port 5000)
-- [ ] AI backend: cd rwanda-travel-ai && uvicorn backend.main:app --reload --port 8000
+- [ ] AI backend: cd rwanda-travel-ai && uvicorn backend.main:app --reload --port 8080
 
 ## [ ] 5. Test Endpoints
 - [ ] Run scripts/test_ai_endpoints.py
-- [ ] Manual test: curl http://localhost:8000/health, /predict, /chat, /translate
+- [ ] Manual test: curl http://localhost:8080/health, /predict, /chat, /translate
 - [ ] Test auth: http://localhost:5000/login
 
 ## [ ] 6. Frontend Integration

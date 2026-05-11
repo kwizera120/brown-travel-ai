@@ -8,7 +8,7 @@ if sys.platform == 'win32':
     sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
 
 def verify_connectivity():
-    base_url = "http://localhost:8000"
+    base_url = "http://localhost:8080"
     
     print("Checking /housing-locations...")
     try:

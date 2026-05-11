@@ -16,7 +16,7 @@ I've integrated the translation feature directly into your FastAPI backend with 
 
 Simply run:
 ```bash
-uvicorn backend.main:app --reload --port 8000
+uvicorn backend.main:app --reload --port 8080
 ```
 
 Or use the quick start script:
@@ -26,7 +26,7 @@ run_app.bat
 
 ### Step 2: Access the App
 
-Open your browser to: `http://localhost:8000`
+Open your browser to: `http://localhost:8080`
 
 ### Step 3: Use the Translation Widget
 
@@ -89,14 +89,14 @@ The system tries these services in order:
 ## Testing the Translation
 
 ### Test via Web Interface:
-1. Open http://localhost:8000
+1. Open http://localhost:8080
 2. Click the translator icon
 3. Type: "Hello, how are you?"
 4. Select French
 5. You should see: "Bonjour, comment allez-vous?"
 
 ### Test via API:
-Visit http://localhost:8000/docs and try:
+Visit http://localhost:8080/docs and try:
 
 **POST /translate**
 ```json

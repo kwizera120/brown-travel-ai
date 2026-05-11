@@ -595,7 +595,7 @@ const server = createServer(async (req, res) => {
   try {
     // Proxy /api/ai/* to the local AI backend (FastAPI)
     if (url.pathname.startsWith('/api/ai')) {
-      const aiBackend = process.env.AI_BACKEND || 'http://localhost:8000';
+      const aiBackend = process.env.AI_BACKEND || 'http://localhost:8080';
       const aiPath = url.pathname.replace(/^\/api\/ai/, '') || '/';
       const targetUrl = aiBackend.replace(/\/$/, '') + aiPath + (url.search || '');
       console.log('[proxy] forwarding', req.method, url.pathname, '->', targetUrl);
