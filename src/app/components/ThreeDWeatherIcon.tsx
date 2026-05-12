@@ -22,9 +22,9 @@ export const ThreeDWeatherIcon: React.FC<ThreeDWeatherIconProps> = ({ iconCode, 
 
   const floatVariants = animate ? {
     animate: {
-      y: [0, -4, 0],
+      y: [0, -3, 0],
       transition: {
-        duration: 4,
+        duration: 5,
         repeat: Infinity,
         ease: "easeInOut"
       }
@@ -32,46 +32,66 @@ export const ThreeDWeatherIcon: React.FC<ThreeDWeatherIconProps> = ({ iconCode, 
   } : {};
 
   const renderIcon = () => {
+    // Shared definitions for the "smoothy" look
+    const defs = (
+      <defs>
+        {/* Soft Sun Glow */}
+        <radialGradient id="sunSmooth" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#ffdb4e" />
+          <stop offset="70%" stopColor="#f9a825" />
+          <stop offset="100%" stopColor="#ef6c00" />
+        </radialGradient>
+        
+        {/* Glassy Cloud Gradient */}
+        <linearGradient id="cloudSmooth" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="100%" stopColor="#f1f5f9" />
+        </linearGradient>
+
+        {/* Night Moon Gradient */}
+        <linearGradient id="moonSmooth" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#f8fafc" />
+          <stop offset="100%" stopColor="#94a3b8" />
+        </linearGradient>
+
+        {/* Soft Shadow Filter */}
+        <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="1.5" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+      </defs>
+    );
+
     switch (code) {
-      case '01': // Clear sky
-        return isNight ? (
+      case '01': // Clear
+        return (
           <g>
-            <defs>
-              <linearGradient id="moonGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#e2e8f0" />
-                <stop offset="100%" stopColor="#94a3b8" />
-              </linearGradient>
-              <filter id="moonGlow">
-                <feGaussianBlur stdDeviation="2" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-              </filter>
-            </defs>
-            <circle cx="12" cy="12" r="8" fill="url(#moonGradient)" filter="url(#moonGlow)" />
-            <path d="M12 4a8 8 0 0 0 0 16 8 8 0 0 1 0-16z" fill="#cbd5e1" opacity="0.5" />
-          </g>
-        ) : (
-          <g>
-            <defs>
-              <radialGradient id="sunGradient">
-                <stop offset="0%" stopColor="#fbbf24" />
-                <stop offset="100%" stopColor="#f59e0b" />
-              </radialGradient>
-              <filter id="sunGlow">
-                <feGaussianBlur stdDeviation="3" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-              </filter>
-            </defs>
-            <circle cx="12" cy="12" r="8" fill="url(#sunGradient)" filter="url(#sunGlow)" />
-            {animate && (
-              <motion.circle
-                cx="12" cy="12" r="10"
-                stroke="#fbbf24"
-                strokeWidth="0.5"
-                strokeDasharray="2 4"
-                fill="none"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              />
+            {defs}
+            {isNight ? (
+              <g filter="url(#softGlow)">
+                <circle cx="12" cy="12" r="8" fill="url(#moonSmooth)" />
+                <circle cx="15" cy="9" r="8" fill="currentColor" className="text-slate-900" />
+                <motion.circle 
+                  cx="6" cy="6" r="0.5" fill="white" 
+                  animate={{ opacity: [0, 1, 0] }} 
+                  transition={{ duration: 2, repeat: Infinity }} 
+                />
+                <motion.circle 
+                  cx="18" cy="18" r="0.5" fill="white" 
+                  animate={{ opacity: [0, 1, 0] }} 
+                  transition={{ duration: 2, repeat: Infinity, delay: 1 }} 
+                />
+              </g>
+            ) : (
+              <g filter="url(#softGlow)">
+                <motion.circle 
+                  cx="12" cy="12" r="8" 
+                  fill="url(#sunSmooth)"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <circle cx="12" cy="12" r="8" fill="none" stroke="white" strokeWidth="0.5" opacity="0.3" />
+              </g>
             )}
           </g>
         );
@@ -104,35 +124,33 @@ export const ThreeDWeatherIcon: React.FC<ThreeDWeatherIconProps> = ({ iconCode, 
           </g>
         );
 
-      case '09': // Shower rain
+      case '09': // Rain
       case '10': // Rain
         return (
           <g>
-            <defs>
-              <linearGradient id="rainCloudGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#94a3b8" />
-                <stop offset="100%" stopColor="#475569" />
-              </linearGradient>
-            </defs>
+            {defs}
             <path 
               d="M17.5 15c2.5 0 4.5-2 4.5-4.5S20 6 17.5 6c-.2 0-.4 0-.6.1C15.8 3.6 13.1 2 10 2 6.1 2 3 5.1 3 9c0 .1 0 .2 0 .3C1.2 10.1 0 11.9 0 14c0 2.2 1.8 4 4 4h13.5z" 
-              fill="url(#rainCloudGradient)" 
+              fill="#cbd5e1"
+              filter="url(#softGlow)"
             />
             {[1, 2, 3].map((i) => (
-              <motion.path
+              <motion.rect
                 key={i}
-                d={`M${6 + i * 4} 19 v3`}
-                stroke="#60a5fa"
-                strokeWidth="2"
-                strokeLinecap="round"
+                x={6 + i * 4}
+                y="18"
+                width="1.5"
+                height="4"
+                rx="0.75"
+                fill="#60a5fa"
                 animate={animate ? {
-                  y: [0, 5, 0],
-                  opacity: [0, 1, 0]
+                  y: [0, 4, 0],
+                  opacity: [0.3, 1, 0.3]
                 } : {}}
                 transition={{
-                  duration: 1,
+                  duration: 1.5,
                   repeat: Infinity,
-                  delay: i * 0.2,
+                  delay: i * 0.3,
                   ease: "linear"
                 }}
               />
@@ -140,28 +158,24 @@ export const ThreeDWeatherIcon: React.FC<ThreeDWeatherIconProps> = ({ iconCode, 
           </g>
         );
 
-      case '11': // Thunderstorm
+      case '11': // Storm
         return (
           <g>
+            {defs}
             <path 
               d="M17.5 15c2.5 0 4.5-2 4.5-4.5S20 6 17.5 6c-.2 0-.4 0-.6.1C15.8 3.6 13.1 2 10 2 6.1 2 3 5.1 3 9c0 .1 0 .2 0 .3C1.2 10.1 0 11.9 0 14c0 2.2 1.8 4 4 4h13.5z" 
-              fill="#334155" 
+              fill="#64748b"
+              filter="url(#softGlow)"
             />
             <motion.path
-              d="M10 17l-2 4h3l-2 4"
+              d="M10 16l-1 3h2l-1 3"
               stroke="#fbbf24"
-              strokeWidth="2"
+              strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
               fill="none"
-              animate={animate ? {
-                opacity: [0, 1, 0, 1, 0]
-              } : {}}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                times: [0, 0.1, 0.2, 0.3, 1]
-              }}
+              animate={animate ? { opacity: [0, 1, 0, 1, 0] } : {}}
+              transition={{ duration: 2, repeat: Infinity }}
             />
           </g>
         );
@@ -169,52 +183,28 @@ export const ThreeDWeatherIcon: React.FC<ThreeDWeatherIconProps> = ({ iconCode, 
       case '13': // Snow
         return (
           <g>
+            {defs}
             <path 
               d="M17.5 15c2.5 0 4.5-2 4.5-4.5S20 6 17.5 6c-.2 0-.4 0-.6.1C15.8 3.6 13.1 2 10 2 6.1 2 3 5.1 3 9c0 .1 0 .2 0 .3C1.2 10.1 0 11.9 0 14c0 2.2 1.8 4 4 4h13.5z" 
-              fill="url(#cloudGradient)" 
+              fill="url(#cloudSmooth)"
+              filter="url(#softGlow)"
             />
             {[1, 2, 3].map((i) => (
               <motion.circle
                 key={i}
                 cx={6 + i * 4}
                 cy="20"
-                r="1.5"
+                r="1.2"
                 fill="white"
                 animate={animate ? {
-                  y: [0, 5],
+                  y: [0, 4],
                   opacity: [0, 1, 0],
-                  x: [0, (i % 2 === 0 ? 2 : -2)]
                 } : {}}
                 transition={{
-                  duration: 2,
+                  duration: 2.5,
                   repeat: Infinity,
-                  delay: i * 0.5,
+                  delay: i * 0.6,
                   ease: "linear"
-                }}
-              />
-            ))}
-          </g>
-        );
-
-      case '50': // Mist
-        return (
-          <g>
-            {[1, 2, 3].map((i) => (
-              <motion.path
-                key={i}
-                d={`M${4} ${8 + i * 4} h16`}
-                stroke="#e2e8f0"
-                strokeWidth="2"
-                strokeLinecap="round"
-                opacity="0.6"
-                animate={animate ? {
-                  x: [-2, 2, -2]
-                } : {}}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  delay: i * 0.3,
-                  ease: "easeInOut"
                 }}
               />
             ))}
@@ -223,7 +213,10 @@ export const ThreeDWeatherIcon: React.FC<ThreeDWeatherIconProps> = ({ iconCode, 
 
       default:
         return (
-          <circle cx="12" cy="12" r="8" fill="#e2e8f0" />
+          <g>
+            {defs}
+            <circle cx="12" cy="12" r="8" fill="url(#cloudSmooth)" filter="url(#softGlow)" />
+          </g>
         );
     }
   };
