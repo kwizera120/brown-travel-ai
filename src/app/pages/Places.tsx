@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
+import { useAuth } from '../context/AuthContext';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
-import { MapPin, Star, Clock, DollarSign, TreePine, Waves, Building2, Mountain, Heart, Hotel, Sparkles, Map } from 'lucide-react';
+import { MapPin, Star, Clock, DollarSign, TreePine, Waves, Building2, Mountain, Heart, Hotel, Sparkles, Map, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from '../components/common/ImageWithFallback';
 import { attractionsAPI, type Attraction } from '../api/travelApi';
 import { dummyPlaces } from '../utils/dummyData';
@@ -18,15 +21,17 @@ const LocationWeather = ({ city }: { city: string }) => {
     <motion.div 
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20 shadow-sm"
+      className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/30 shadow-md"
     >
-      <ThreeDWeatherIcon iconCode={weather.icon} className="w-4 h-4" />
-      <span className="text-[10px] font-black text-slate-900">{weather.temperature}°</span>
+      <ThreeDWeatherIcon iconCode={weather.icon} className="w-7 h-7" />
+      <span className="text-sm font-black text-slate-900">{weather.temperature}°</span>
     </motion.div>
   );
 };
 
 export function Places() {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [places, setPlaces] = useState<Attraction[]>(dummyPlaces as unknown as Attraction[]);
   const [stats, setStats] = useState({ parks: 4, lakes: 3, culture: 4, hotels: 5 });
@@ -248,7 +253,7 @@ export function Places() {
                       </div>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       <div className="flex items-center gap-2">
                         <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse" />
                         <h4 className="text-[9px] font-black text-slate-900 uppercase tracking-[0.2em]">Signature Experiences</h4>
@@ -260,6 +265,26 @@ export function Places() {
                           </span>
                         ))}
                       </div>
+                      
+                      <button 
+                        onClick={() => {
+                          if (!isAuthenticated) {
+                            toast.info("Discover More with SuraRwanda", {
+                              description: "To view full destination details, tactical maps, and local cultural insights, please sign in to your profile.",
+                              action: {
+                                label: "Sign In",
+                                onClick: () => navigate('/login')
+                              },
+                            });
+                          } else {
+                            // Logic for authenticated users could go here
+                          }
+                        }}
+                        className="w-full mt-2 py-3 bg-slate-50 hover:bg-primary/5 text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] border border-slate-100 hover:border-primary/20 transition-all flex items-center justify-center gap-2 group"
+                      >
+                        Explore Detailed Intelligence
+                        <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                      </button>
                     </div>
                   </div>
                 </motion.div>

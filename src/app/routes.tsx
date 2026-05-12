@@ -20,35 +20,19 @@ export const router = createBrowserRouter([
   },
   {
     path: "/places",
-    element: (
-      <ProtectedRoute>
-        <Places />
-      </ProtectedRoute>
-    ),
+    Component: Places,
   },
   {
     path: "/food-guide",
-    element: (
-      <ProtectedRoute>
-        <FoodGuide />
-      </ProtectedRoute>
-    ),
+    Component: FoodGuide,
   },
   {
     path: "/trip-planner",
-    element: (
-      <ProtectedRoute>
-        <TripPlanner />
-      </ProtectedRoute>
-    ),
+    Component: TripPlanner,
   },
   {
     path: "/housing",
-    element: (
-      <ProtectedRoute>
-        <Housing />
-      </ProtectedRoute>
-    ),
+    Component: Housing,
   },
   {
     path: "/my-itinerary",
@@ -60,10 +44,6 @@ export const router = createBrowserRouter([
   },
   {
     path: "/travel-info",
-    element: (
-      <ProtectedRoute>
-        <TravelInfo />
-      </ProtectedRoute>
-    ),
+    Component: TravelInfo,
   },
 ]);

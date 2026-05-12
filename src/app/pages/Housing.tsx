@@ -14,12 +14,18 @@ import { ChatMessageBubble, ChatTypingIndicator } from '../components/chat/ChatM
 import { buildRwandaRealEstateContext } from '../data/rwandaRealEstateMarket';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
+
 interface Message {
   role: 'user' | 'assistant';
   content: string;
 }
 
 export function Housing() {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const housingMarketContext = buildRwandaRealEstateContext();
   const [locations, setLocations] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -91,6 +97,18 @@ export function Housing() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isAuthenticated) {
+      toast.info("Secure Your Real Estate Insights", {
+        description: "To access professional property predictions and market analytics, please join our tactical community.",
+        action: {
+          label: "Login",
+          onClick: () => navigate('/login')
+        },
+      });
+      return;
+    }
+
     setLoading(true);
 
     const payload = {
@@ -136,6 +154,17 @@ export function Housing() {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim() || isChatLoading) return;
+
+    if (!isAuthenticated) {
+      toast.info("Consult the AI Real Estate Expert", {
+        description: "To engage in professional market briefings and secure your property consultation, please sign in.",
+        action: {
+          label: "Authenticate",
+          onClick: () => navigate('/login')
+        },
+      });
+      return;
+    }
 
     const newUserMessage: Message = { role: 'user', content: inputMessage };
     setChatMessages(prev => [...prev, newUserMessage]);

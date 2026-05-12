@@ -48,7 +48,9 @@ export function useWeatherAPI(city: string = 'Kigali') {
         const seenDates = new Set();
         for (const item of forecastData.list) {
           const date = item.dt_txt.split(' ')[0];
-          if (!seenDates.has(date) && dailyForecast.length < 5) {
+          const time = item.dt_txt.split(' ')[1];
+          // Filter for daytime forecast (around 12:00:00)
+          if (!seenDates.has(date) && time === '12:00:00' && dailyForecast.length < 5) {
             seenDates.add(date);
             dailyForecast.push({
               date,
@@ -57,6 +59,16 @@ export function useWeatherAPI(city: string = 'Kigali') {
               icon: item.weather[0].icon,
             });
           }
+        }
+        // Fallback if 12:00 is not available for today
+        if (dailyForecast.length === 0 && forecastData.list.length > 0) {
+          const item = forecastData.list[0];
+          dailyForecast.push({
+            date: item.dt_txt.split(' ')[0],
+            temp: Math.round(item.main.temp),
+            description: item.weather[0].description,
+            icon: item.weather[0].icon,
+          });
         }
       }
 

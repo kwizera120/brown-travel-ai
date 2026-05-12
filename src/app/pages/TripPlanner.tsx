@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
 import { aiApi } from '../api/aiApi';
@@ -20,10 +21,10 @@ const LocationWeather = ({ city }: { city: string }) => {
     <motion.div 
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="flex items-center gap-1.5 bg-[#f0fdf4] px-2 py-0.5 rounded-full border border-[#bbf7d0] shadow-sm"
+      className="flex items-center gap-2 bg-[#f0fdf4] px-3 py-1 rounded-full border border-[#bbf7d0] shadow-md"
     >
-      <ThreeDWeatherIcon iconCode={weather.icon} className="w-3.5 h-3.5" />
-      <span className="text-[9px] font-black text-slate-900">{weather.temperature}°</span>
+      <ThreeDWeatherIcon iconCode={weather.icon} className="w-6 h-6" />
+      <span className="text-sm font-black text-slate-900">{weather.temperature}°</span>
     </motion.div>
   );
 };
@@ -42,14 +43,14 @@ const DestinationWeather = ({ city }: { city: string }) => {
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 flex items-center gap-4"
+      className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20 flex items-center gap-5"
     >
-      <ThreeDWeatherIcon iconCode={weather.icon} className="w-10 h-10" />
+      <ThreeDWeatherIcon iconCode={weather.icon} className="w-16 h-16" />
       <div>
-        <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">Current Weather in {city}</p>
+        <p className="text-xs font-bold uppercase tracking-widest opacity-70">Current Weather in {city}</p>
         <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-bold">{weather.temperature}°C</span>
-          <span className="text-xs opacity-80">{weather.description}</span>
+          <span className="text-4xl font-bold">{weather.temperature}°C</span>
+          <span className="text-sm opacity-80">{weather.description}</span>
         </div>
       </div>
     </motion.div>
@@ -96,7 +97,12 @@ interface RecommendationResult {
 }
 
 export function TripPlanner() {
+  const isWaterRoute = (from: string, to: string) => {
+    const waterBodies = ['Gisenyi', 'Kibuye', 'Cyangugu', 'Nyamasheke', 'Karongi', 'Rubavu', 'Rusizi'];
+    return waterBodies.some(loc => from.includes(loc)) && waterBodies.some(loc => to.includes(loc));
+  };
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   
   // Fare Estimator State
   const [fareData, setFareData] = useState({
@@ -427,6 +433,16 @@ Note: This report is a strategic guide generated based on current AI modeling an
   };
 
   const handleSaveToItinerary = () => {
+    if (!isAuthenticated) {
+      toast.info("Join the SuraRwanda Community", {
+        description: "To save this tactical itinerary and access it from any terminal, please sign in to your professional profile.",
+        action: {
+          label: "Sign In",
+          onClick: () => navigate('/login')
+        },
+      });
+      return;
+    }
     if (!recommendations) return;
 
     const newItineraryItems = recommendations.recommendations.map((text, i) => {
@@ -524,7 +540,9 @@ Note: This report is a strategic guide generated based on current AI modeling an
                       <option value="moto">Moto</option>
                       <option value="taxi">Taxi</option>
                       <option value="car">Car</option>
-                      <option value="boat">Boat</option>
+                      <option value="boat" disabled={!isWaterRoute(fareData.from_city, fareData.to_city)}>
+                        Boat {!isWaterRoute(fareData.from_city, fareData.to_city) && "(Land Route Only)"}
+                      </option>
                     </select>
                   </label>
                   <label>
@@ -877,4 +895,5 @@ Note: This report is a strategic guide generated based on current AI modeling an
     </div>
   );
 }
+
 

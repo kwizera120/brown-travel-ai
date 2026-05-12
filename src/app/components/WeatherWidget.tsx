@@ -102,14 +102,14 @@ export const WeatherWidget = () => {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-white/70 mb-1">
+                  <div className="flex items-center gap-2 text-white/90 mb-1">
                     <MapPin className="w-3 h-3 text-primary" />
                     <span className="text-[10px] font-black uppercase tracking-widest">{weather.city}</span>
                   </div>
-                  <h3 className="text-5xl font-black text-white tracking-tighter">
-                    {weather.temperature}°<span className="text-2xl text-white/50">C</span>
+                  <h3 className="text-5xl font-black text-white tracking-tighter drop-shadow-md">
+                    {weather.temperature}°<span className="text-2xl text-white/70">C</span>
                   </h3>
-                  <p className="text-primary font-bold uppercase text-[10px] tracking-widest mt-1">
+                  <p className="text-primary font-black uppercase text-[10px] tracking-[0.2em] mt-1 drop-shadow-sm">
                     {weather.description}
                   </p>
                 </div>

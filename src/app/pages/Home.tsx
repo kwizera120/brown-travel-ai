@@ -66,7 +66,7 @@ export function Home() {
       <Navigation />
       
       {/* Premium Hero Section */}
-      <div className="relative h-[92vh] min-h-[700px] overflow-hidden bg-slate-900">
+      <div className="relative h-[85vh] min-h-[600px] overflow-hidden bg-slate-900">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
@@ -110,7 +110,7 @@ export function Home() {
               <span className="text-[10px] font-black uppercase tracking-[0.3em]">AI-Driven Travel Innovation</span>
             </motion.div>
             
-            <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-white mb-3 md:mb-6 tracking-tighter leading-[1.1] md:leading-[0.85] uppercase">
+            <h1 className="text-xl md:text-3xl lg:text-4xl font-black text-white mb-3 md:mb-5 tracking-tighter leading-[1.1] md:leading-[0.85] uppercase">
               {heroImages[currentSlide].title.split(' ').map((word, i) => (
                 <span key={i} className={['rwanda', 'hills', 'gorillas', 'kivu', 'kigali'].includes(word.toLowerCase()) ? 'text-primary block md:inline' : ''}>{word}{' '}</span>
               ))}
@@ -173,7 +173,7 @@ export function Home() {
               <Zap className="w-3.5 h-3.5 md:w-4 md:h-4 fill-current" />
               <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em]">Core Ecosystem</span>
             </div>
-            <h2 className="text-2xl md:text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter mb-3 md:mb-5 uppercase leading-none">The Future of <span className="text-primary italic">Sura</span></h2>
+            <h2 className="text-xl md:text-3xl lg:text-4xl font-black text-slate-900 tracking-tighter mb-2 md:mb-4 uppercase leading-none">The Future of <span className="text-primary italic">Sura</span></h2>
             <p className="text-sm md:text-lg text-slate-500 font-medium italic leading-relaxed">Redefining the Rwandan experience with a blend of cultural authenticity and cutting-edge intelligence.</p>
           </motion.div>
         </div>
@@ -191,21 +191,21 @@ export function Home() {
               >
                 <Link
                   to={feature.link}
-                  className="card-lift glass rounded-xl md:rounded-2xl p-5 md:p-8 border-slate-100 group block h-full relative overflow-hidden bg-slate-50/50"
+                  className="card-lift glass rounded-lg md:rounded-xl p-4 md:p-6 border-slate-100 group block h-full relative overflow-hidden bg-slate-50/50"
                 >
-                  <div className={`w-10 h-10 md:w-14 md:h-14 rounded-lg md:rounded-xl ${feature.color} flex items-center justify-center mb-3 md:mb-6 shadow-lg group-hover:scale-110 transition-all duration-500 group-hover:rotate-6`}>
-                    <Icon className="w-5 h-5 md:w-7 md:h-7 text-white" />
+                  <div className={`w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl ${feature.color} flex items-center justify-center mb-2 md:mb-4 shadow-lg group-hover:scale-110 transition-all duration-500 group-hover:rotate-6`}>
+                    <Icon className="w-4 h-4 md:w-6 md:h-6 text-white" />
                   </div>
                   
                   {feature.ai && (
-                    <div className="absolute top-4 md:top-6 right-4 md:right-6 bg-indigo-100 text-indigo-700 px-2.5 md:px-3 py-1 rounded-full text-[7px] md:text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5">
-                      <Bot className="w-2.5 h-2.5" />
+                    <div className="absolute top-3 md:top-4 right-3 md:right-4 bg-indigo-100 text-indigo-700 px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[6px] md:text-[7px] font-black uppercase tracking-widest flex items-center gap-1">
+                      <Bot className="w-2 h-2" />
                       Neural Engine
                     </div>
                   )}
 
-                  <h3 className="text-lg md:text-xl lg:text-2xl font-black text-slate-900 mb-2 md:mb-4 group-hover:text-primary transition-colors uppercase tracking-tighter">{feature.title}</h3>
-                  <p className="text-slate-500 text-xs md:text-sm font-medium leading-relaxed mb-5 md:mb-8 italic">{feature.description}</p>
+                  <h3 className="text-base md:text-lg lg:text-xl font-black text-slate-900 mb-1.5 md:mb-3 group-hover:text-primary transition-colors uppercase tracking-tighter">{feature.title}</h3>
+                  <p className="text-slate-500 text-[10px] md:text-xs font-medium leading-relaxed mb-4 md:mb-6 italic">{feature.description}</p>
                   
                   <div className="flex items-center text-primary font-black uppercase tracking-tighter gap-2 text-[10px] md:text-xs">
                     Enter Platform
@@ -230,10 +230,10 @@ export function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter mb-8 md:mb-12 uppercase leading-[1.1] md:leading-[0.9]">
+              <h2 className="text-2xl md:text-4xl lg:text-5xl font-black text-white tracking-tighter mb-6 md:mb-10 uppercase leading-[1.1] md:leading-[0.9]">
                 Why <span className="text-primary italic underline decoration-white/20 underline-offset-8">Rwanda</span>?
               </h2>
-              <div className="grid gap-6 md:gap-8">
+              <div className="grid gap-4 md:gap-6">
                 {[
                   { icon: TreePine, title: 'Mountain Gorillas', desc: 'Face-to-face with the gentle giants in high-altitude rainforests.' },
                   { icon: Mountain, title: 'Vivid Landscapes', desc: 'Mist-covered peaks and the volcanic majesty of the Virungas.' },
@@ -245,14 +245,14 @@ export function Home() {
                     initial={{ opacity: 0, x: -30 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.15 }}
-                    className="flex gap-4 md:gap-6 items-start group"
+                    className="flex gap-3 md:gap-5 items-start group"
                   >
-                    <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:border-primary group-hover:text-white text-slate-400 transition-all duration-500">
-                      <item.icon className="w-5 h-5 md:w-7 md:h-7" />
+                    <div className="w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:border-primary group-hover:text-white text-slate-400 transition-all duration-500">
+                      <item.icon className="w-4 h-4 md:w-6 md:h-6" />
                     </div>
                     <div>
-                      <h3 className="text-lg md:text-xl font-black text-white uppercase tracking-tight mb-1.5 md:mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
-                      <p className="text-slate-400 text-sm md:text-base font-medium italic leading-relaxed">{item.desc}</p>
+                      <h3 className="text-base md:text-lg font-black text-white uppercase tracking-tight mb-1 md:mb-1.5 group-hover:text-primary transition-colors">{item.title}</h3>
+                      <p className="text-slate-400 text-[10px] md:text-xs font-medium italic leading-relaxed">{item.desc}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -313,13 +313,13 @@ export function Home() {
             <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 md:mb-8">
               <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-primary" />
             </div>
-            <h2 className="text-3xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-6 md:mb-8 tracking-tighter uppercase leading-[1.1] md:leading-[0.9]">Synthesize Your <span className="text-primary italic">Epic</span> Journey</h2>
-            <p className="text-base md:text-xl text-slate-500 mb-8 md:mb-12 font-medium italic max-w-2xl mx-auto leading-relaxed">
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-4 md:mb-6 tracking-tighter uppercase leading-[1.1] md:leading-[0.9]">Synthesize Your <span className="text-primary italic">Epic</span> Journey</h2>
+            <p className="text-sm md:text-lg text-slate-500 mb-6 md:mb-10 font-medium italic max-w-2xl mx-auto leading-relaxed">
               Unlock the power of AI to curate a travel experience that resonates with your soul.
             </p>
-            <Link to="/trip-planner" className="btn-primary inline-flex items-center gap-3 md:gap-4 py-4 md:py-6 px-8 md:px-12 rounded-xl md:rounded-2xl group shadow-[0_20px_40px_rgba(22,163,74,0.3)]">
-              <span className="text-lg md:text-xl font-black uppercase tracking-tighter">Enter Strategy Room</span>
-              <ArrowRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-3 transition-transform duration-500" />
+            <Link to="/trip-planner" className="btn-primary inline-flex items-center gap-2.5 md:gap-3.5 py-3 md:py-5 px-6 md:px-10 rounded-lg md:rounded-xl group shadow-[0_20px_40px_rgba(22,163,74,0.3)]">
+              <span className="text-base md:text-lg font-black uppercase tracking-tighter">Enter Strategy Room</span>
+              <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-3 transition-transform duration-500" />
             </Link>
           </motion.div>
         </div>
