@@ -8,7 +8,7 @@ export interface Attraction {
   duration: string;
   price: string;
   activities: string[];
-  location: {
+  location?: {
     lat: number;
     lng: number;
   } | null;

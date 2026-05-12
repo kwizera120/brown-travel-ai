@@ -5,8 +5,82 @@ import { aiApi } from '../api/aiApi';
 import { ChatMessageBubble, ChatTypingIndicator } from '../components/chat/ChatMessageBubble';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
-import { Loader2, Mic, Send, Sparkles, Compass, MapPin, X } from 'lucide-react';
+import { Loader2, Mic, Send, Sparkles, Compass, MapPin, X, Sun, Cloud, CloudRain, CloudLightning, Snowflake, Thermometer, Wind, Droplets } from 'lucide-react';
 import './TripPlanner.css';
+import { useWeatherAPI } from '../hooks/useWeatherAPI';
+import { ThreeDWeatherIcon } from '../components/ThreeDWeatherIcon';
+import { toast } from 'sonner';
+
+const LocationWeather = ({ city }: { city: string }) => {
+  const { weather, loading } = useWeatherAPI(city);
+
+  if (loading || !weather) return <div className="w-12 h-5 bg-slate-100 animate-pulse rounded-lg" />;
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="flex items-center gap-1.5 bg-[#f0fdf4] px-2 py-0.5 rounded-full border border-[#bbf7d0] shadow-sm"
+    >
+      <ThreeDWeatherIcon iconCode={weather.icon} className="w-3.5 h-3.5" />
+      <span className="text-[9px] font-black text-slate-900">{weather.temperature}°</span>
+    </motion.div>
+  );
+};
+
+const DestinationWeather = ({ city }: { city: string }) => {
+  const { weather, loading } = useWeatherAPI(city);
+
+  if (loading || !weather) return (
+    <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 animate-pulse">
+      <div className="h-4 w-24 bg-white/20 rounded mb-2" />
+      <div className="h-8 w-16 bg-white/20 rounded" />
+    </div>
+  );
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 flex items-center gap-4"
+    >
+      <ThreeDWeatherIcon iconCode={weather.icon} className="w-10 h-10" />
+      <div>
+        <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">Current Weather in {city}</p>
+        <div className="flex items-baseline gap-2">
+          <span className="text-2xl font-bold">{weather.temperature}°C</span>
+          <span className="text-xs opacity-80">{weather.description}</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+const RecommendationItemWithWeather = ({ text }: { text: string }) => {
+  const [city, setCity] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Basic extraction of city names from common destinations
+    const locations = ['Kigali', 'Musanze', 'Gisenyi', 'Kibuye', 'Nyamata', 'Butare', 'Rwamagana', 'Akagera', 'Nyungwe'];
+    const found = locations.find(loc => text.toLowerCase().includes(loc.toLowerCase()));
+    if (found) setCity(found);
+    else if (text.toLowerCase().includes('volcano')) setCity('Musanze');
+  }, [text]);
+
+  return (
+    <li className="rec-item flex items-start justify-between gap-3 text-sm text-[#4e7060] italic">
+      <div className="flex items-start gap-3">
+        <span className="rec-item-check text-[#66c296] font-bold">✓</span>
+        <span>{text}</span>
+      </div>
+      {city && (
+        <div className="shrink-0 scale-75 origin-right opacity-80 group-hover:opacity-100 transition-opacity">
+           <LocationWeather city={city} />
+        </div>
+      )}
+    </li>
+  );
+};
 
 // Types for AI module
 interface ChatMessage {
@@ -170,7 +244,27 @@ export function TripPlanner() {
         message: chatMessage,
         history: chatHistory
       });
-      setChatHistory(prev => [...prev, { role: 'assistant', content: response.response }]);
+
+      let finalResponse = response.response;
+
+      // Check if weather is relevant
+      const lMsg = chatMessage.toLowerCase();
+      if (lMsg.includes('weather') || lMsg.includes('forecast') || lMsg.includes('temperature') || lMsg.includes('rain')) {
+        const city = fareData.to_city || 'Kigali';
+        try {
+          const weatherRes = await fetch(
+            `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&units=metric&appid=${(import.meta as any).env.VITE_WEATHER_API_KEY}`
+          );
+          if (weatherRes.ok) {
+            const wData = await weatherRes.json();
+            finalResponse += `\n\n[Weather Update for ${city}: ${Math.round(wData.main.temp)}°C, ${wData.weather[0].description}]`;
+          }
+        } catch (e) {
+          console.error("Failed to fetch weather for chatbot", e);
+        }
+      }
+
+      setChatHistory(prev => [...prev, { role: 'assistant', content: finalResponse }]);
     } catch (error) {
       setChatHistory(prev => [...prev, { role: 'assistant', content: 'The assistant is temporarily unavailable.' }]);
     } finally {
@@ -330,6 +424,31 @@ Note: This report is a strategic guide generated based on current AI modeling an
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  };
+
+  const handleSaveToItinerary = () => {
+    if (!recommendations) return;
+
+    const newItineraryItems = recommendations.recommendations.map((text, i) => {
+      // Basic heuristic to parse text into ItineraryItem format
+      let day = 1;
+      const dayMatch = text.match(/Day (\d+)/i);
+      if (dayMatch) day = parseInt(dayMatch[1]);
+
+      return {
+        id: `ai-${Date.now()}-${i}`,
+        day: day,
+        title: text.split(': ')[1] || text,
+        location: fareData.to_city,
+        time: '09:00', // Default
+        cost: '$0',
+        notes: 'AI Recommended'
+      };
+    });
+
+    const existing = JSON.parse(localStorage.getItem('sura_itinerary') || '[]');
+    localStorage.setItem('sura_itinerary', JSON.stringify([...existing, ...newItineraryItems]));
+    toast.success("Tactical itinerary updated. Your trip plan has been saved successfully.");
   };
 
   return (
@@ -522,13 +641,16 @@ Note: This report is a strategic guide generated based on current AI modeling an
               
               {recommendations && (
                 <div className="recommendations-container flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                  <div className="plan-header-card bg-[#66c296] text-white p-8 rounded-3xl shadow-lg">
-                    <h2 className="text-2xl font-bold mb-2">✓ Your Personalized Plan</h2>
-                    <p className="plan-summary text-sm opacity-90 mb-6 italic">Based on ${recommendations.budget_usd} for {recommendations.duration_days} days with {recommendations.travelers} traveler(s)</p>
-                    <div className="daily-budget flex flex-col">
-                      <span className="text-xs uppercase tracking-widest font-bold opacity-80">Daily budget per person</span>
-                      <strong className="text-4xl font-['Space_Grotesk'] mt-1">${dailyBudget}</strong>
+                  <div className="plan-header-card bg-[#66c296] text-white p-8 rounded-3xl shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div>
+                      <h2 className="text-2xl font-bold mb-2">✓ Your Personalized Plan</h2>
+                      <p className="plan-summary text-sm opacity-90 mb-6 italic">Based on ${recommendations.budget_usd} for {recommendations.duration_days} days with {recommendations.travelers} traveler(s)</p>
+                      <div className="daily-budget flex flex-col">
+                        <span className="text-xs uppercase tracking-widest font-bold opacity-80">Daily budget per person</span>
+                        <strong className="text-4xl font-['Space_Grotesk'] mt-1">${dailyBudget}</strong>
+                      </div>
                     </div>
+                    <DestinationWeather city={fareData.to_city} />
                   </div>
 
                   {Object.entries({
@@ -548,10 +670,7 @@ Note: This report is a strategic guide generated based on current AI modeling an
                         </div>
                         <ul className="rec-list flex flex-col gap-4">
                           {recs.map((text, i) => (
-                            <li key={i} className="rec-item flex items-start gap-3 text-sm text-[#4e7060] italic">
-                              <span className="rec-item-check text-[#66c296] font-bold">✓</span>
-                              <span>{text}</span>
-                            </li>
+                            <RecommendationItemWithWeather key={i} text={text} />
                           ))}
                         </ul>
                       </div>
@@ -559,7 +678,10 @@ Note: This report is a strategic guide generated based on current AI modeling an
                   })}
 
                   <div className="flex flex-col md:flex-row gap-4">
-                    <button className="primary-btn save-itinerary-btn flex-1 py-5 rounded-2xl font-bold uppercase tracking-widest text-sm">
+                    <button 
+                      onClick={handleSaveToItinerary}
+                      className="primary-btn save-itinerary-btn flex-1 py-5 rounded-2xl font-bold uppercase tracking-widest text-sm"
+                    >
                       Save to My Itinerary →
                     </button>
                     <button 

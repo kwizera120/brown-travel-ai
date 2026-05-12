@@ -162,7 +162,6 @@ export function Login() {
                     <input type="checkbox" className="rounded border-slate-300 text-primary focus:ring-primary" />
                     <span className="text-slate-500 group-hover:text-slate-700 transition-colors">Remember Session</span>
                   </label>
-                  <a href="#" className="text-primary hover:text-green-700">Lost Key?</a>
                 </div>
               )}
 

@@ -161,28 +161,6 @@ export function TravelInfo() {
           </div>
         </motion.div>
 
-        <motion.div variants={itemVariants} className="mb-24 glass rounded-[3rem] p-12 border-primary/20 bg-primary/5">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-10">
-            <div className="flex items-center gap-6">
-              <div className="w-20 h-20 bg-primary text-white rounded-[2rem] flex items-center justify-center shadow-2xl">
-                <Mail className="w-10 h-10" />
-              </div>
-              <div>
-                <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter leading-none">Support Hub</h2>
-                <p className="text-slate-500 font-medium italic mt-2 text-lg">Direct communication line to Sura Rwanda agents.</p>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-4">
-              <button className="btn-primary px-10 py-5 rounded-2xl flex items-center gap-3">
-                <span className="text-sm font-black uppercase tracking-widest">Open Session</span>
-                <Sparkles className="w-5 h-5" />
-              </button>
-              <button className="px-10 py-5 bg-white border border-slate-200 rounded-2xl font-black text-slate-900 uppercase tracking-widest text-sm hover:bg-slate-50 transition-all">
-                Documentation
-              </button>
-            </div>
-          </div>
-        </motion.div>
       </motion.div>
 
       <Footer />

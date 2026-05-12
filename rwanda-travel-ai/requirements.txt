@@ -8,4 +8,5 @@ python-dotenv
 langdetect
 uvicorn[standard]
 groq
+werkzeug
 

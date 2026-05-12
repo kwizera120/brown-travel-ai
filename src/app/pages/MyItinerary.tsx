@@ -16,53 +16,67 @@ interface ItineraryItem {
 
 export function MyItinerary() {
   const [loading, setLoading] = useState(true);
-  const [items, setItems] = useState<ItineraryItem[]>([
-    {
-      id: '1',
-      day: 1,
-      title: 'Arrival in Kigali',
-      location: 'Kigali International Airport',
-      time: '14:00',
-      cost: '$0',
-      notes: 'Hotel transfer included'
-    },
-    {
-      id: '2',
-      day: 1,
-      title: 'Kigali Genocide Memorial',
-      location: 'Kigali',
-      time: '16:00',
-      cost: 'Free',
-      notes: 'Respectful attire required'
-    },
-    {
-      id: '3',
-      day: 2,
-      title: 'Gorilla Trekking',
-      location: 'Volcanoes National Park',
-      time: '07:00',
-      cost: '$1,500',
-      notes: 'Bring hiking boots and rain jacket'
-    },
-  ]);
+  const [items, setItems] = useState<ItineraryItem[]>([]);
 
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [newItem, setNewItem] = useState({
-    day: 1,
-    title: '',
-    location: '',
-    time: '',
-    cost: '',
-    notes: ''
-  });
-
-  // Simulate loading state for "Advanced" feel
+  // Load from localStorage on mount
   useEffect(() => {
+    const saved = localStorage.getItem('sura_itinerary');
+    if (saved) {
+      setItems(JSON.parse(saved));
+    } else {
+      // Default initial items if nothing in storage
+      setItems([
+        {
+          id: '1',
+          day: 1,
+          title: 'Arrival in Kigali',
+          location: 'Kigali International Airport',
+          time: '14:00',
+          cost: '$0',
+          notes: 'Hotel transfer included'
+        },
+        {
+          id: '2',
+          day: 1,
+          title: 'Kigali Genocide Memorial',
+          location: 'Kigali',
+          time: '16:00',
+          cost: 'Free',
+          notes: 'Respectful attire required'
+        },
+        {
+          id: '3',
+          day: 2,
+          title: 'Gorilla Trekking',
+          location: 'Volcanoes National Park',
+          time: '07:00',
+          cost: '$1,500',
+          notes: 'Bring hiking boots and rain jacket'
+        },
+      ]);
+    }
     const timer = setTimeout(() => setLoading(false), 1500);
     return () => clearTimeout(timer);
   }, []);
 
-  const addItem = () => {
+  // Save to localStorage whenever items change
+  useEffect(() => {
+    if (!loading) {
+      localStorage.setItem('sura_itinerary', JSON.stringify(items));
+    }
+  }, [items, loading]);
+
+  const [showAddForm, setShowAddForm] = useState(false);
+   const [newItem, setNewItem] = useState({
+     day: 1,
+     title: '',
+     location: '',
+     time: '',
+     cost: '',
+     notes: ''
+   });
+
+   const addItem = () => {
     if (newItem.title && newItem.location) {
       const item: ItineraryItem = {
         id: Date.now().toString(),

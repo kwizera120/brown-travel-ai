@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
-import { Map, MapPin, Utensils, ArrowRight, Globe, MessageCircle, ChevronLeft, ChevronRight, TreePine, Mountain, Heart, ShieldCheck, Ticket, Sparkles, Zap, Bot } from 'lucide-react';
+import { WeatherWidget } from '../components/WeatherWidget';
+import { Map, MapPin, Utensils, ArrowRight, Globe, MessageCircle, ChevronLeft, ChevronRight, TreePine, Mountain, Heart, ShieldCheck, Ticket, Sparkles, Zap, Bot, Building2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ImageWithFallback } from '../components/common/ImageWithFallback';
 
@@ -38,6 +39,14 @@ export function Home() {
       description: 'Neural-powered itineraries tailored to your unique travel style.',
       link: '/trip-planner',
       color: 'bg-indigo-600',
+      ai: true
+    },
+    {
+      icon: Building2,
+      title: 'Housing Intelligence',
+      description: 'Predictive analytics for Rwandan real estate and rental markets.',
+      link: '/housing',
+      color: 'bg-rose-600',
       ai: true
     },
   ];
@@ -122,6 +131,11 @@ export function Home() {
               </Link>
             </div>
           </motion.div>
+        </div>
+
+        {/* Floating Weather Widget - Upper Right */}
+        <div className="absolute top-24 right-6 md:right-12 z-20 hidden lg:block w-80">
+          <WeatherWidget />
         </div>
 
         {/* Dynamic Indicators */}

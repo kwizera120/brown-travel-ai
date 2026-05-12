@@ -6,6 +6,25 @@ import { ImageWithFallback } from '../components/common/ImageWithFallback';
 import { attractionsAPI, type Attraction } from '../api/travelApi';
 import { dummyPlaces } from '../utils/dummyData';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useWeatherAPI } from '../hooks/useWeatherAPI';
+import { ThreeDWeatherIcon } from '../components/ThreeDWeatherIcon';
+
+const LocationWeather = ({ city }: { city: string }) => {
+  const { weather, loading } = useWeatherAPI(city);
+
+  if (loading || !weather) return <div className="w-16 h-6 bg-slate-100 animate-pulse rounded-lg" />;
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20 shadow-sm"
+    >
+      <ThreeDWeatherIcon iconCode={weather.icon} className="w-4 h-4" />
+      <span className="text-[10px] font-black text-slate-900">{weather.temperature}°</span>
+    </motion.div>
+  );
+};
 
 export function Places() {
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -43,7 +62,7 @@ export function Places() {
         }
         
         setPlaces(data as unknown as Attraction[]);
-        setStats(response.stats || { parks: 4, lakes: 3, culture: 4, hotels: 5 });
+        setStats((response.stats as any) || { parks: 4, lakes: 3, culture: 4, hotels: 5 });
       } catch {
         if (active) {
           // Fallback to dummy data on error
@@ -194,9 +213,12 @@ export function Places() {
                       </span>
                     </div>
 
-                    <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md rounded-xl p-1.5 px-2.5 flex items-center gap-1 shadow-xl border border-white/20">
-                      <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                      <span className="text-[10px] font-black text-slate-900">{place.rating}</span>
+                    <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
+                      <div className="bg-white/95 backdrop-blur-md rounded-xl p-1.5 px-2.5 flex items-center gap-1 shadow-xl border border-white/20">
+                        <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                        <span className="text-[10px] font-black text-slate-900">{place.rating}</span>
+                      </div>
+                      <LocationWeather city={place.name.split(' ')[0]} />
                     </div>
 
                     <div className="absolute bottom-4 left-6 right-6">
